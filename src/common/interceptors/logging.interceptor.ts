@@ -6,7 +6,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -14,6 +14,8 @@ export class LoggingInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest<Request>();
+    const response = context.switchToHttp().getResponse<Response>();
+
     const { method, url, ip } = request;
     const userAgent = request.headers['user-agent'] ?? 'unknown';
     const now = Date.now();
@@ -23,7 +25,8 @@ export class LoggingInterceptor implements NestInterceptor {
       `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     // attach so exception filter and meta builder can read it
-    (request as any).correlationId = correlationId;
+    request.correlationId = correlationId;
+    response.setHeader('x-correlation-id', correlationId);
 
     this.logger.log(
       `[${correlationId}] --> ${method} ${url} | IP: ${ip} | UA: ${userAgent}`,
@@ -32,9 +35,8 @@ export class LoggingInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap({
         next: () => {
-          const res = context.switchToHttp().getResponse();
           this.logger.log(
-            `[${correlationId}] <-- ${method} ${url} | ${res.statusCode} | ${Date.now() - now}ms`,
+            `[${correlationId}] <-- ${method} ${url} | ${response.statusCode} | ${Date.now() - now}ms`,
           );
         },
         error: (err: Error) => {

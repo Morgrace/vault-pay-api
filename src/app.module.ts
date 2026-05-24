@@ -9,6 +9,10 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseTransformInterceptor } from './common/interceptors/response-transform.interceptor';
+import { RedisModule } from './shared/redis/redis.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { SessionGuard } from './common/guards/session.guard';
+import { AdminGuard } from './common/guards/admin.guard';
 
 @Controller()
 export class AppController {
@@ -81,6 +85,8 @@ export class AppController {
     }),
     DatabaseModule,
     UsersModule,
+    RedisModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -89,6 +95,8 @@ export class AppController {
     // logging first = outermost wrapper = captures full request time
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: ResponseTransformInterceptor },
+    SessionGuard,
+    AdminGuard,
   ],
 })
 export class AppModule {}
