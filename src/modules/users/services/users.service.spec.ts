@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from '../repositories/users.repository';
 import { UsersService } from './users.service';
 
@@ -171,6 +171,53 @@ describe('UsersService', () => {
       providerId: 'google-123',
     };
 
+    // inside describe('findOrCreate')
+
+    it('throws ConflictException when email exists under a different provider', async () => {
+      const existingUser = { ...mockUser, provider: 'google' };
+
+      mockUsersRepository.findByProvider.mockResolvedValue(null); // not found by provider
+      mockUsersRepository.findByEmail.mockResolvedValue(existingUser); // but email exists
+
+      await expect(
+        service.findOrCreate({
+          ...userData,
+          provider: 'github',
+          providerId: 'github-999',
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('ConflictException message tells the user which provider to use', async () => {
+      const existingUser = { ...mockUser, provider: 'google' };
+
+      mockUsersRepository.findByProvider.mockResolvedValue(null);
+      mockUsersRepository.findByEmail.mockResolvedValue(existingUser);
+
+      await expect(
+        service.findOrCreate({
+          ...userData,
+          provider: 'github',
+          providerId: 'github-999',
+        }),
+      ).rejects.toThrow('google'); // message must name the correct provider
+    });
+
+    it('does not call createUser when email conflict is detected', async () => {
+      mockUsersRepository.findByProvider.mockResolvedValue(null);
+      mockUsersRepository.findByEmail.mockResolvedValue(mockUser);
+
+      await expect(
+        service.findOrCreate({
+          ...userData,
+          provider: 'github',
+          providerId: 'github-999',
+        }),
+      ).rejects.toThrow(ConflictException);
+
+      expect(mockUsersRepository.createUser).not.toHaveBeenCalled();
+    });
+
     it('returns existing user when found — does not create', async () => {
       mockUsersRepository.findByProvider.mockResolvedValue(mockUser);
 
@@ -188,6 +235,7 @@ describe('UsersService', () => {
     it('creates and returns new user when not found', async () => {
       const newUser = { ...mockUser, id: 'brand-new-uuid' };
       mockUsersRepository.findByProvider.mockResolvedValue(null);
+      mockUsersRepository.findByEmail.mockResolvedValue(null);
       mockUsersRepository.createUser.mockResolvedValue(newUser);
 
       const result = await service.findOrCreate(userData);
@@ -204,19 +252,24 @@ describe('UsersService', () => {
       expect(mockUsersRepository.createUser).not.toHaveBeenCalled();
     });
 
-    it('always checks by provider and providerId — not email', async () => {
-      // two different Google accounts can theoretically share an email edge case
-      // findOrCreate must identify by provider identity, not email
+    it('checks by provider first, then email as fallback — never creates without both checks', async () => {
       mockUsersRepository.findByProvider.mockResolvedValue(null);
+      mockUsersRepository.findByEmail.mockResolvedValue(null); // ← add this
       mockUsersRepository.createUser.mockResolvedValue(mockUser);
 
       await service.findOrCreate(userData);
 
+      // provider check happens first
       expect(mockUsersRepository.findByProvider).toHaveBeenCalledWith(
         userData.provider,
         userData.providerId,
       );
-      expect(mockUsersRepository.findByEmail).not.toHaveBeenCalled();
+      // email check happens second, as conflict guard
+      expect(mockUsersRepository.findByEmail).toHaveBeenCalledWith(
+        userData.email,
+      );
+      // only creates after both checks pass
+      expect(mockUsersRepository.createUser).toHaveBeenCalledWith(userData);
     });
   });
 });

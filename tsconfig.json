@@ -17,6 +17,7 @@
       "src/*": ["./src/*"]
     },
     "types": ["jest", "node"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

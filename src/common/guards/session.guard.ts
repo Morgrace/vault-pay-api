@@ -4,6 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from 'src/modules/auth/services/auth.service';
 
 @Injectable()
@@ -11,7 +12,7 @@ export class SessionGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const token = request.cookies?.vaultpay_session;
     if (!token) {
       throw new UnauthorizedException('No session token');
