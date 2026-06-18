@@ -10,13 +10,13 @@ import {
 } from 'drizzle-orm/pg-core';
 import { plans } from './plans';
 import { users } from './users';
+import { uniqueIndex } from 'drizzle-orm/pg-core';
 export const subscriptionStatusEnum = pgEnum('subscription_status', [
   'initiated', // row created, payment not yet confirmed
   'active', // paying, within current period
   'past_due', // payment failed, within retry grace period
   'suspended', // max retries exhausted, access cut off
   'cancelled', // user or admin cancelled
-  'expired', // period ended, not renewed (for one-time or non-auto-renew plans)
   'non_renewing', // Paystack's own status: active but set to not renew
 ]);
 export const subscriptions = pgTable(
@@ -49,5 +49,10 @@ export const subscriptions = pgTable(
     index('idx_subscriptions_status').on(table.status),
     index('idx_subscriptions_user_id').on(table.userId),
     index('idx_subscriptions_current_period_end').on(table.currentPeriodEnd),
+    uniqueIndex('idx_subscriptions_active_unique')
+      .on(table.userId, table.planId)
+      .where(
+        sql`${table.status} IN ('initiated', 'active', 'past_due', 'non_renewing')`,
+      ),
   ],
 );

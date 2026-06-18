@@ -12,7 +12,11 @@ import { timestamp } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const planCurrencyEnum = pgEnum('plan_currency', ['NGN', 'USD']);
-export const planIntervalEnum = pgEnum('plan_interval', ['weekly', 'monthly']);
+export const planIntervalEnum = pgEnum('plan_interval', [
+  'weekly',
+  'monthly',
+  'yearly',
+]);
 export const plans = pgTable('plans', {
   id: uuid('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
