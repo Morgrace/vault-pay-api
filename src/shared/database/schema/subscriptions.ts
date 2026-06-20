@@ -50,7 +50,7 @@ export const subscriptions = pgTable(
     index('idx_subscriptions_user_id').on(table.userId),
     index('idx_subscriptions_current_period_end').on(table.currentPeriodEnd),
     uniqueIndex('idx_subscriptions_active_unique')
-      .on(table.userId, table.planId)
+      .on(table.userId)
       .where(
         sql`${table.status} IN ('initiated', 'active', 'past_due', 'non_renewing')`,
       ),

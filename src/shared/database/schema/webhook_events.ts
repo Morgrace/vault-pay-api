@@ -1,4 +1,13 @@
-import { boolean, index, jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 export const webhookEvents = pgTable(
   'webhook_events',
@@ -14,9 +23,5 @@ export const webhookEvents = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [
-    index('idx_webhook_events_processed').on(table.processed),
-    index('idx_webhook_events_event_type').on(table.eventType),
-    index('idx_webhook_events_created_at').on(table.createdAt),
-  ],
+  (table) => [index('idx_webhook_events_processed').on(table.processed)],
 );

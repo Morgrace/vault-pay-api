@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm';
-import { check, index, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  check,
+  index,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { orders } from './orders';
 import { subscriptions } from './subscriptions';
 import { users } from './users';
@@ -39,6 +48,5 @@ export const complaints = pgTable(
       sql`(${table.orderId} IS NOT NULL AND ${table.subscriptionId} IS NULL) OR (${table.orderId} IS NULL AND ${table.subscriptionId} IS NOT NULL)`,
     ),
     index('idx_complaints_user_id').on(table.userId),
-    index('idx_complaints_status').on(table.status),
   ],
 );

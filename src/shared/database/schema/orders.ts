@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   bigint,
+  boolean,
   check,
   index,
   pgEnum,
@@ -30,7 +31,8 @@ export const orders = pgTable(
     amount: bigint('amount', { mode: 'number' }).notNull(),
     currency: planCurrencyEnum('currency').notNull(),
     status: orderStatusEnum('status').notNull().default('pending'),
-
+    valueDelivered: boolean('value_delivered').notNull().default(false),
+    deliveredAt: timestamp('delivered_at', { withTimezone: true }),
     refundedAt: timestamp('refunded_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -45,8 +47,6 @@ export const orders = pgTable(
       sql`${table.articleId} IS NOT NULL OR ${table.planId} IS NOT NULL`,
     ),
     index('idx_orders_email').on(table.email),
-    index('idx_orders_status').on(table.status),
-    index('idx_orders_created_at').on(table.createdAt),
     index('idx_orders_user_id').on(table.userId),
   ],
 );

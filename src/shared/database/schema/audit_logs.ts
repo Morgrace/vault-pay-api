@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm';
-import { bigserial, index, inet, jsonb, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  bigserial,
+  index,
+  inet,
+  jsonb,
+  pgTable,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 export const auditLogs = pgTable(
   'audit_logs',
@@ -20,7 +29,6 @@ export const auditLogs = pgTable(
   },
   (table) => [
     index('idx_audit_logs_entity').on(table.entityType, table.entityId),
-    index('idx_audit_logs_created_at').on(table.createdAt),
     index('idx_audit_logs_actor')
       .on(table.actorId)
       .where(sql`${table.actorId} IS NOT NULL`),

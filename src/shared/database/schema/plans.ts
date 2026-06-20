@@ -1,15 +1,15 @@
-import { boolean } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import {
   bigint,
+  boolean,
   pgEnum,
   pgTable,
   text,
+  timestamp,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
 import { users } from './users';
-import { timestamp } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
 
 export const planCurrencyEnum = pgEnum('plan_currency', ['NGN', 'USD']);
 export const planIntervalEnum = pgEnum('plan_interval', [
@@ -21,6 +21,7 @@ export const plans = pgTable('plans', {
   id: uuid('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
+  features: text('features'),
   amount: bigint('amount', { mode: 'number' }).notNull(),
   currency: planCurrencyEnum('currency').notNull().default('NGN'),
   interval: planIntervalEnum('interval').notNull(),
