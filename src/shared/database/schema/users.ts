@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { timestamp } from 'drizzle-orm/pg-core';
 import { pgEnum } from 'drizzle-orm/pg-core';
+import { boolean } from 'drizzle-orm/pg-core';
 import { uniqueIndex } from 'drizzle-orm/pg-core';
 import { varchar } from 'drizzle-orm/pg-core';
 import { uuid } from 'drizzle-orm/pg-core';
@@ -17,6 +18,7 @@ export const users = pgTable(
     avatarUrl: varchar('avatar_url', { length: 500 }),
     provider: varchar('provider', { length: 50 }).notNull(),
     providerId: varchar('provider_id', { length: 255 }).notNull(),
+    isActive: boolean('is_active').notNull().default(true),
     role: userRoleEnum('role').notNull().default('user'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -24,6 +26,7 @@ export const users = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .default(sql`now()`),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
   },
   (table) => [
     uniqueIndex('users_provider_provider_id_idx').on(

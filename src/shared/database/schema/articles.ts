@@ -17,7 +17,7 @@ export const articles = pgTable(
   'articles',
   {
     id: uuid('id').primaryKey(),
-    title: varchar('title', { length: 500 }).notNull(),
+    title: varchar('title', { length: 500 }).unique().notNull(),
     content: text('content').notNull(),
     coverImageUrl: varchar('cover_image_url', { length: 500 }),
     isFree: boolean('is_free').notNull().default(false),
@@ -33,6 +33,7 @@ export const articles = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
   },
   (table) => [
     check(

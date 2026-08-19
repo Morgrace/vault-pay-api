@@ -22,6 +22,13 @@
       "when": 1781881766930,
       "tag": "0002_glamorous_dazzler",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787092265759,
+      "tag": "0003_pale_nuke",
+      "breakpoints": true
     }
   ]
 }

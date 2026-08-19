@@ -2,6 +2,9 @@ export const appConfig = () => ({
   app: {
     port: parseInt(process.env.PORT ?? '3000', 10),
     authRedirectUrl: process.env.AUTH_REDIRECT_URL,
+    env: process.env.NODE_ENV || 'development',
+    apiPrefix: process.env.API_PREFIX || 'api/v1',
+    clientUrl: process.env.CLIENT_URL,
   },
   database: {
     host: process.env.DB_HOST ?? 'localhost',

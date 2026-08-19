@@ -1,18 +1,19 @@
 import {
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
   Query,
   Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
-import { AuthService } from '../services/auth.service';
-import { SessionGuard } from 'src/common/guards/session.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { Public } from 'src/common/decorators/public.decorator';
 import { type ISessionData } from '../auth.interface';
+import { AuthService } from '../services/auth.service';
 
 @Controller('auth')
 export class AuthController {
@@ -21,23 +22,26 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
+  @Public()
   @Get('google')
   async googleAuth(@Res() res: Response) {
     const url = await this.authService.getAuthorizationUrl('google');
     res.redirect(url);
   }
 
+  @Public()
   @Get('github')
   async githubAuth(@Res() res: Response) {
     const url = await this.authService.getAuthorizationUrl('github');
     res.redirect(url);
   }
 
+  @Public()
   @Get('google/callback')
   async googleCallback(
     @Query('code') code: string,
     @Query('state') state: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
     const { sessionToken } = await this.authService.handleCallback(
       'google',
@@ -48,11 +52,12 @@ export class AuthController {
     res.redirect(this.getRedirectUrl());
   }
 
+  @Public()
   @Get('github/callback')
   async githubCallback(
     @Query('code') code: string,
     @Query('state') state: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
     const { sessionToken } = await this.authService.handleCallback(
       'github',
@@ -64,6 +69,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const token = req.cookies?.vaultpay_session as string | undefined;
     if (token) {
@@ -74,7 +80,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(SessionGuard)
+  @HttpCode(HttpStatus.OK)
   me(@CurrentUser() user: ISessionData) {
     return { user };
   }

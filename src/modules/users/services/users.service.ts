@@ -48,7 +48,10 @@ export class UsersService {
       data.provider,
       data.providerId,
     );
-    if (existingByProvider) return existingByProvider;
+
+    if (existingByProvider) {
+      return existingByProvider;
+    }
 
     const existingByEmail = await this.usersRepo.findByEmail(data.email);
     if (existingByEmail) {

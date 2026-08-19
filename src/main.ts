@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import { AppModule } from './app.module';
+import { appConfig } from './config';
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
@@ -13,13 +14,24 @@ process.on('unhandledRejection', (reason) => {
 });
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  try {
+    const app = await NestFactory.create(AppModule);
 
-  app.enableShutdownHooks();
+    const { port, apiPrefix } = appConfig().app;
 
-  app.use(cookieParser());
+    app.setGlobalPrefix(apiPrefix, {
+      exclude: ['health', 'metrics'],
+    });
 
-  await app.listen(process.env.PORT ?? 3000);
+    app.enableShutdownHooks();
+
+    app.use(cookieParser());
+
+    await app.listen(port ?? 3000);
+  } catch (error) {
+    console.error('🔥 Error during application bootstrap', error);
+    process.exit(1);
+  }
 }
 
-bootstrap();
+void bootstrap();

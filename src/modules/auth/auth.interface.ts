@@ -1,3 +1,5 @@
+import { RoleType } from 'src/common/decorators/roles.decorator';
+
 export interface IOAuthUserInfo {
   email: string;
   name: string;
@@ -10,5 +12,5 @@ export type TOAuthProviders = 'google' | 'github';
 export interface ISessionData {
   userId: string;
   email: string;
-  role: string;
+  role: RoleType;
 }

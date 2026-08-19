@@ -1,23 +1,26 @@
 import { Controller, Get, Inject, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { appConfig } from './config';
-import * as Joi from 'joi';
-import { DatabaseModule, DRIZZLE_DB } from './shared/database/database.module';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { UsersModule } from './modules/users/users.module';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import * as Joi from 'joi';
+import { CustomExceptionFilters } from './common/filters/custom-exception.filters';
+import { RolesGuard } from './common/guards/roles.guard';
+import { SessionGuard } from './common/guards/session.guard';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseTransformInterceptor } from './common/interceptors/response-transform.interceptor';
-import { RedisModule } from './shared/redis/redis.module';
+import { appConfig } from './config';
 import { AuthModule } from './modules/auth/auth.module';
-import { SessionGuard } from './common/guards/session.guard';
-import { AdminGuard } from './common/guards/admin.guard';
+import { UsersModule } from './modules/users/users.module';
+import { DatabaseModule, DRIZZLE_DB } from './shared/database/database.module';
+import { RedisModule } from './shared/redis/redis.module';
+import { ArticlesModule } from './modules/articles/articles.module';
+import { Public } from './common/decorators/public.decorator';
 
+@Public()
 @Controller()
 export class AppController {
   constructor(@Inject(DRIZZLE_DB) private readonly db: PostgresJsDatabase) {}
-  @Get()
+  @Get('health')
   health() {
     return { status: 'ok' };
   }
@@ -87,16 +90,17 @@ export class AppController {
     UsersModule,
     RedisModule,
     AuthModule,
+    ArticlesModule,
   ],
   controllers: [AppController],
   providers: [
-    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_FILTER, useClass: CustomExceptionFilters },
 
     // logging first = outermost wrapper = captures full request time
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: ResponseTransformInterceptor },
-    SessionGuard,
-    AdminGuard,
+    { provide: APP_GUARD, useClass: SessionGuard },
+    RolesGuard,
   ],
 })
 export class AppModule {}

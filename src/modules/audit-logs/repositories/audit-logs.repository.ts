@@ -4,10 +4,7 @@ import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { BaseRepository } from 'src/shared/database/base.repository';
 import { DRIZZLE_DB } from 'src/shared/database/database.module';
 import { auditLogs } from 'src/shared/database/schema';
-import {
-  IPaginatedResult,
-  IPaginationOptions,
-} from 'src/shared/types/query.interfaces';
+import { IPaginatedResult, IPaginationOptions } from 'src/shared/types';
 
 @Injectable()
 export class AuditLogsRepository extends BaseRepository<typeof auditLogs> {
@@ -24,10 +21,10 @@ export class AuditLogsRepository extends BaseRepository<typeof auditLogs> {
   async findByEntity(
     entityType: string,
     entityId: string,
-    options?: IPaginationOptions,
+    queryParams?: IPaginationOptions,
   ): Promise<IPaginatedResult<typeof auditLogs.$inferSelect>> {
-    const page = options?.page ?? 1;
-    const limit = options?.limit ?? 50;
+    const page = queryParams?.page ?? 1;
+    const limit = Math.min(queryParams?.limit ?? 50, 100);
     const offset = (page - 1) * limit;
 
     const where = and(

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { BaseRepository } from 'src/shared/database/base.repository';
 import { DRIZZLE_DB } from 'src/shared/database/database.module';
@@ -24,7 +24,11 @@ export class UsersRepository extends BaseRepository<typeof users> {
       .select()
       .from(users)
       .where(
-        and(eq(users.provider, provider), eq(users.providerId, providerId)),
+        and(
+          eq(users.provider, provider),
+          eq(users.providerId, providerId),
+          eq(users.isActive, true),
+        ),
       );
     return result[0] || null;
   }
@@ -41,5 +45,19 @@ export class UsersRepository extends BaseRepository<typeof users> {
 
   async findAll() {
     return this.db.select().from(users);
+  }
+
+  async removeUser(id: string) {
+    const [user] = await this.db
+      .update(users)
+      .set({
+        fullName: sql`${users.fullName} || '-deleted=' || ${uuidv7()}`,
+        email: sql`${users.email} || '-deleted=' || ${uuidv7()}`,
+        deletedAt: sql`now()`,
+        isActive: false,
+      })
+      .where(and(eq(users.id, id), isNull(users.deletedAt)))
+      .returning();
+    return user ?? null;
   }
 }

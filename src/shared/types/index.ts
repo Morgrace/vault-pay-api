@@ -10,3 +10,8 @@ export interface IPaginationOptions {
   page?: number;
   limit?: number;
 }
+
+export enum ECurrency {
+  NGN = 'NGN',
+  USD = 'USD',
+}
