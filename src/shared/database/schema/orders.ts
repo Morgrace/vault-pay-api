@@ -13,12 +13,13 @@ import {
 import { articles } from './articles';
 import { planCurrencyEnum, plans } from './plans';
 import { users } from './users';
-export const orderStatusEnum = pgEnum('order_status', [
+export const ORDER_STATUS_VALUES = [
   'pending',
   'success',
   'failed',
   'refunded',
-]);
+] as const;
+export const orderStatusEnum = pgEnum('order_status', ORDER_STATUS_VALUES);
 
 export const orders = pgTable(
   'orders',
@@ -44,7 +45,7 @@ export const orders = pgTable(
   (table) => [
     check(
       'chk_order_has_subject',
-      sql`${table.articleId} IS NOT NULL OR ${table.planId} IS NOT NULL`,
+      sql`(${table.articleId} IS NOT NULL AND ${table.planId} IS NULL) OR (${table.articleId} IS NULL AND ${table.planId} IS NOT NULL)`,
     ),
     index('idx_orders_email').on(table.email),
     index('idx_orders_user_id').on(table.userId),

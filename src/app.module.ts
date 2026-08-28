@@ -15,6 +15,7 @@ import { DatabaseModule, DRIZZLE_DB } from './shared/database/database.module';
 import { RedisModule } from './shared/redis/redis.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { Public } from './common/decorators/public.decorator';
+import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 
 @Public()
 @Controller()
@@ -91,6 +92,7 @@ export class AppController {
     RedisModule,
     AuthModule,
     ArticlesModule,
+    AuditLogsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { BaseRepository } from 'src/shared/database/base.repository';
+import { BaseRepository, DbOrTx } from 'src/shared/database/base.repository';
 import { DRIZZLE_DB } from 'src/shared/database/database.module';
 import { auditLogs } from 'src/shared/database/schema';
 import { IPaginatedResult, IPaginationOptions } from 'src/shared/types';
+import { uuidv7 } from 'uuidv7';
 
 @Injectable()
 export class AuditLogsRepository extends BaseRepository<typeof auditLogs> {
@@ -13,13 +14,18 @@ export class AuditLogsRepository extends BaseRepository<typeof auditLogs> {
   }
   async append(
     data: typeof auditLogs.$inferInsert,
+    tx?: DbOrTx,
   ): Promise<typeof auditLogs.$inferSelect> {
-    const [entry] = await this.db.insert(auditLogs).values(data).returning();
+    const executor = tx ?? this.db;
+
+    const [entry] = await executor
+      .insert(auditLogs)
+      .values({ ...data, entityId: uuidv7() })
+      .returning();
     return entry;
   }
 
   async findByEntity(
-    entityType: string,
     entityId: string,
     queryParams?: IPaginationOptions,
   ): Promise<IPaginatedResult<typeof auditLogs.$inferSelect>> {
@@ -27,10 +33,7 @@ export class AuditLogsRepository extends BaseRepository<typeof auditLogs> {
     const limit = Math.min(queryParams?.limit ?? 50, 100);
     const offset = (page - 1) * limit;
 
-    const where = and(
-      eq(auditLogs.entityType, entityType),
-      eq(auditLogs.entityId, entityId),
-    );
+    const where = eq(auditLogs.entityId, entityId);
 
     const [items, countResult] = await Promise.all([
       this.db

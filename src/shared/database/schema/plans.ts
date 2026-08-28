@@ -11,7 +11,8 @@ import {
 } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
-export const planCurrencyEnum = pgEnum('plan_currency', ['NGN', 'USD']);
+export const PLAN_CURRENCY_VALUES = ['NGN', 'USD'] as const;
+export const planCurrencyEnum = pgEnum('plan_currency', PLAN_CURRENCY_VALUES);
 export const planIntervalEnum = pgEnum('plan_interval', [
   'weekly',
   'monthly',
