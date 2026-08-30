@@ -30,7 +30,7 @@ export const createOrderSchema = orderSchemaBase
   .refine((v) => Boolean(v.articleId) !== Boolean(v.planId), {
     error: 'order must be tied to exactly one of articleId or planId, not both',
   });
-export type TOrdersDto = z.infer<typeof createOrderSchema>;
+export type TCreateOrdersDto = z.infer<typeof createOrderSchema>;
 export const updateOrderSchema = orderSchemaBase
   .omit({ amount: true })
   .partial();

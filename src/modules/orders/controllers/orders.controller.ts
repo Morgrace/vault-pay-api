@@ -1,7 +1,47 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Ip,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { OrdersService } from '../services/orders.service';
+import type { TCreateOrdersDto } from '../validation/orders-validation.schema';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import type { ISessionData } from 'src/modules/auth/auth.interface';
+import { Public } from 'src/common/decorators/public.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Role, Roles } from 'src/common/decorators/roles.decorator';
+import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
+  @Public()
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(
+    @Body() body: TCreateOrdersDto,
+    @Ip() ip: string,
+    @CurrentUser() currentUser: ISessionData,
+  ) {
+    return this.ordersService.create(body, currentUser, ip);
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  updateStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    status: (typeof ORDER_STATUS_VALUES)[number],
+    @Ip() ip: string,
+    @CurrentUser() currentUser: ISessionData,
+  ) {
+    return this.ordersService.updateStatus(id, status, currentUser, ip);
+  }
 }

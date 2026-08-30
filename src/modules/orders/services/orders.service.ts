@@ -22,12 +22,7 @@ export class OrdersService {
     private readonly auditLogService: AuditLogsService,
   ) {}
 
-  async create(
-    dto: unknown,
-    actor: string,
-    currentUser?: ISessionData,
-    ip?: string,
-  ) {
+  async create(dto: unknown, currentUser?: ISessionData, ip?: string) {
     const parsed = await createOrderSchema.safeParseAsync(dto);
 
     if (!parsed.success) {
@@ -52,7 +47,7 @@ export class OrdersService {
           entityType: 'order',
           entityId: order.id,
           event: 'order.created',
-          actorType: actor,
+          actorType: currentUser?.userId ? 'user' : 'system',
           actorId: currentUser?.userId,
           newState: order,
           ipAddress: ip,
@@ -66,7 +61,6 @@ export class OrdersService {
   async updateStatus(
     id: string,
     status: (typeof ORDER_STATUS_VALUES)[number],
-    actor: string,
     currentUser?: ISessionData,
     ip?: string,
   ) {
@@ -86,7 +80,7 @@ export class OrdersService {
           entityType: 'order',
           entityId: order.id,
           event: 'order.updated',
-          actorType: actor,
+          actorType: currentUser?.userId ? 'user' : 'system',
           actorId: currentUser?.userId,
           newState: order,
           ipAddress: ip,
