@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -6,13 +7,11 @@ import {
 } from '@nestjs/common';
 import { ArticlesService } from 'src/modules/articles/services/articles.service';
 import { AuditLogsService } from 'src/modules/audit-logs/services/audit-logs.service';
-import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
-import { OrdersRepository } from '../repositories/orders.repository';
-import {
-  createOrderSchema,
-  updateOrderSchema,
-} from '../validation/orders-validation.schema';
 import { ISessionData } from 'src/modules/auth/auth.interface';
+import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
+import z from 'zod';
+import { OrdersRepository } from '../repositories/orders.repository';
+import { createOrderSchema } from '../validation/orders-validation.schema';
 
 @Injectable()
 export class OrdersService {
@@ -58,13 +57,19 @@ export class OrdersService {
     });
   }
 
+  findById(id: string) {
+    return this.ordersRepo.findById(id);
+  }
+
   async updateStatus(
     id: string,
     status: (typeof ORDER_STATUS_VALUES)[number],
     currentUser?: ISessionData,
     ip?: string,
   ) {
-    const parsed = updateOrderSchema.safeParse({ status });
+    const parsed = z
+      .object({ status: z.enum(ORDER_STATUS_VALUES) })
+      .safeParse({ status });
 
     if (!parsed.success) {
       throw new UnprocessableEntityException(parsed.error, 'Validation failed');
@@ -95,6 +100,15 @@ export class OrdersService {
     const article = await this.articleService.findById(articleId);
     if (!article) {
       throw new NotFoundException(`Article ${articleId} not found`);
+    }
+    if (article.isFree) {
+      throw new BadRequestException(`Article ${articleId} is free`);
+    }
+
+    if (!article.publishedAt) {
+      throw new BadRequestException(
+        `Article ${articleId} has not been published yet`,
+      );
     }
   }
 }

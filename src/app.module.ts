@@ -16,6 +16,7 @@ import { RedisModule } from './shared/redis/redis.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { Public } from './common/decorators/public.decorator';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Public()
 @Controller()
@@ -93,6 +94,7 @@ export class AppController {
     AuthModule,
     ArticlesModule,
     AuditLogsModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Ip,
@@ -22,6 +23,13 @@ import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
+
+  @Public()
+  @Get(':id')
+  findById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.ordersService.findById(id);
+  }
+
   @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -38,7 +46,7 @@ export class OrdersController {
   @Roles(Role.ADMIN)
   updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
-    status: (typeof ORDER_STATUS_VALUES)[number],
+    @Body('status') status: (typeof ORDER_STATUS_VALUES)[number],
     @Ip() ip: string,
     @CurrentUser() currentUser: ISessionData,
   ) {

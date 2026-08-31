@@ -12,11 +12,15 @@ import {
 import { orders } from './orders';
 import { planCurrencyEnum } from './plans';
 
-export const transactionStatusEnum = pgEnum('transaction_status', [
+export const TRANSACTION_STATUS_VALUES = [
   'pending',
   'success',
   'failed',
-]);
+] as const;
+export const transactionStatusEnum = pgEnum(
+  'transaction_status',
+  TRANSACTION_STATUS_VALUES,
+);
 
 export const transactions = pgTable(
   'transactions',
@@ -25,10 +29,8 @@ export const transactions = pgTable(
     orderId: uuid('order_id')
       .notNull()
       .references(() => orders.id),
-    paystackReference: varchar('paystack_reference', { length: 255 }).unique(),
-    idempotencyKey: varchar('idempotency_key', { length: 255 })
-      .notNull()
-      .unique(),
+    gatewayReference: varchar('gateway_reference', { length: 255 }).unique(),
+    gatewayProvider: varchar('gateway_provider', { length: 50 }),
     status: transactionStatusEnum('status').notNull().default('pending'),
     amount: bigint('amount', { mode: 'number' }).notNull(),
     currency: planCurrencyEnum('currency').notNull(),
