@@ -3,7 +3,7 @@ import {
   TRANSACTION_STATUS_VALUES,
 } from 'src/shared/database/schema';
 import z from 'zod';
-const transactionsBaseSchema = z.object({
+export const transactionsBaseSchema = z.object({
   currency: z.enum(PLAN_CURRENCY_VALUES),
   amount: z.number().int().positive(),
   failureReason: z.string().max(255).optional(),

@@ -14,6 +14,7 @@ import {
   listTransactionsQuerySchema,
   TCreateTransactionsDto,
   TListTransactionQuery,
+  transactionsBaseSchema,
   TUpdateTransactionDto,
   updateTransactionsSchema,
 } from '../validation/transactions-validation.schema';
@@ -35,7 +36,7 @@ export class TransactionsService {
     return this.transactionsRepo.create(parsed.data, tx);
   }
 
-  find(query: TListTransactionQuery) {
+  async find(query: TListTransactionQuery) {
     const parsed = listTransactionsQuerySchema.safeParse(query);
     if (!parsed.success) {
       throw new UnprocessableEntityException(parsed.error, 'Validation failed');
@@ -43,8 +44,12 @@ export class TransactionsService {
     return this.transactionsRepo.find(parsed.data);
   }
 
-  updateStatus(id: string, status: Pick<ITransaction, 'status'>, tx?: DbOrTx) {
-    const parsed = updateTransactionsSchema
+  async updateStatus(
+    id: string,
+    status: Pick<ITransaction, 'status'>,
+    tx?: DbOrTx,
+  ) {
+    const parsed = transactionsBaseSchema
       .pick({ status: true })
       .safeParse(status);
 
@@ -70,7 +75,7 @@ export class TransactionsService {
     const { gatewayReference } = parsed.data;
 
     if (gatewayReference && existingTransaction.gatewayReference) {
-      if (existingTransaction.gatewayReference !== gatewayReference) {
+      if (existingTransaction.gatewayReference === gatewayReference) {
         throw new ConflictException(
           `transaction ${id} already has a gateway reference, cannot overwrite (existing: ${existingTransaction.gatewayReference}, attempted: ${gatewayReference})`,
         );
