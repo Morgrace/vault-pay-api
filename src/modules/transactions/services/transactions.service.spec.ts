@@ -1,16 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TransactionRepository } from '../repositories/transactions.repositories';
-import { TransactionsService } from './transactions.service';
-import {
-  TCreateTransactionsDto,
-  TUpdateTransactionDto,
-} from '../validation/transactions-validation.schema';
 import {
   ConflictException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersService } from 'src/modules/orders/services/orders.service';
 import { uuidv7 } from 'uuidv7';
+import { TransactionRepository } from '../repositories/transactions.repositories';
+import {
+  TCreateTransactionsDto,
+  TUpdateTransactionDto,
+} from '../validation/transactions-validation.schema';
+import { TransactionsService } from './transactions.service';
 
 type MockRepo = jest.Mocked<
   Pick<TransactionRepository, 'create' | 'find' | 'findById' | 'update'>
@@ -90,7 +90,6 @@ describe('TransactionService', () => {
       await expect(result).rejects.toThrow(UnprocessableEntityException);
       expect(repo.create).not.toHaveBeenCalled();
     });
-
     it('creates transaction record on valid dto', async () => {
       const orderId = uuidv7();
       const dto: TCreateTransactionsDto = {
@@ -109,7 +108,8 @@ describe('TransactionService', () => {
 
       expect(result).toMatchObject(dto);
     });
-
+  });
+  describe('updateStatus', () => {
     it('updateStatus throws UnprocessableEntityException when status is not valid', async () => {
       const dto = { status: 'in_valid' as 'pending' | 'success' | 'failed' };
 
@@ -118,7 +118,9 @@ describe('TransactionService', () => {
       );
       expect(repo.update).not.toHaveBeenCalled();
     });
+  });
 
+  describe('update', () => {
     it('update throw UnprocessableEntityException when dto is invalid', async () => {
       const dto: TUpdateTransactionDto = {
         // failureReason: 'some reason',
