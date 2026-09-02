@@ -11,7 +11,11 @@ import { ISessionData } from 'src/modules/auth/auth.interface';
 import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
 import z from 'zod';
 import { OrdersRepository } from '../repositories/orders.repository';
-import { createOrderSchema } from '../validation/orders-validation.schema';
+import {
+  createOrderSchema,
+  listOrdersQuerySchema,
+} from '../validation/orders-validation.schema';
+import { TransactionsService } from 'src/modules/transactions/services/transactions.service';
 
 @Injectable()
 export class OrdersService {
@@ -19,6 +23,7 @@ export class OrdersService {
     private readonly ordersRepo: OrdersRepository,
     private readonly articleService: ArticlesService,
     private readonly auditLogService: AuditLogsService,
+    private readonly transactionsService: TransactionsService,
   ) {}
 
   async create(dto: unknown, currentUser?: ISessionData, ip?: string) {
@@ -41,6 +46,16 @@ export class OrdersService {
           'Order creation failed unexpectedly',
         );
       }
+
+      await this.transactionsService.create(
+        {
+          amount: order.amount,
+          currency: order.currency,
+          orderId: order.id,
+        },
+        tx,
+      );
+
       await this.auditLogService.append(
         {
           entityType: 'order',
@@ -55,6 +70,14 @@ export class OrdersService {
       );
       return order;
     });
+  }
+
+  async findAll(query: unknown) {
+    const parsed = listOrdersQuerySchema.safeParse(query);
+    if (!parsed.success) {
+      throw new UnprocessableEntityException(parsed.error, 'Validation failed');
+    }
+    return this.ordersRepo.findAll(parsed.data);
   }
 
   findById(id: string) {

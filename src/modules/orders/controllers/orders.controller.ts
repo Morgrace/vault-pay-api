@@ -9,10 +9,14 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from '../services/orders.service';
-import type { TCreateOrdersDto } from '../validation/orders-validation.schema';
+import type {
+  TCreateOrdersDto,
+  TListOrdersQuery,
+} from '../validation/orders-validation.schema';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import type { ISessionData } from 'src/modules/auth/auth.interface';
 import { Public } from 'src/common/decorators/public.decorator';
@@ -23,6 +27,13 @@ import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
+
+  @Get()
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  findAll(@Query() query: TListOrdersQuery) {
+    return this.ordersService.findAll(query);
+  }
 
   @Public()
   @Get(':id')
