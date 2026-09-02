@@ -5,7 +5,6 @@ import { BaseRepository, DbOrTx } from 'src/shared/database/base.repository';
 import { DRIZZLE_DB } from 'src/shared/database/database.module';
 import { auditLogs } from 'src/shared/database/schema';
 import { IPaginatedResult, IPaginationOptions } from 'src/shared/types';
-import { uuidv7 } from 'uuidv7';
 
 @Injectable()
 export class AuditLogsRepository extends BaseRepository<typeof auditLogs> {
@@ -18,10 +17,7 @@ export class AuditLogsRepository extends BaseRepository<typeof auditLogs> {
   ): Promise<typeof auditLogs.$inferSelect> {
     const executor = tx ?? this.db;
 
-    const [entry] = await executor
-      .insert(auditLogs)
-      .values({ ...data, entityId: uuidv7() })
-      .returning();
+    const [entry] = await executor.insert(auditLogs).values(data).returning();
     return entry;
   }
 

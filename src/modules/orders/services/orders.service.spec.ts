@@ -6,12 +6,15 @@ import { OrdersService } from './orders.service';
 import { TCreateOrdersDto } from '../validation/orders-validation.schema';
 import { uuidv7 } from 'uuidv7';
 import { UnprocessableEntityException } from '@nestjs/common';
+import { TransactionsService } from 'src/modules/transactions/services/transactions.service';
 
 type MockAuditLogsService = jest.Mocked<Pick<AuditLogsService, 'append'>>;
 type MockArticlesService = jest.Mocked<Pick<ArticlesService, 'findById'>>;
 type MockRepo = jest.Mocked<
   Pick<OrdersRepository, 'create' | 'findAll' | 'findById' | 'update'>
 >;
+type MockTransactionsService = jest.Mocked<Pick<TransactionsService, 'create'>>;
+
 describe('OrdersService', () => {
   let service: OrdersService;
   const repo: MockRepo = {
@@ -26,6 +29,9 @@ describe('OrdersService', () => {
   const articlesService: MockArticlesService = {
     findById: jest.fn(),
   };
+  const transactionSerivice: MockTransactionsService = {
+    create: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -34,6 +40,7 @@ describe('OrdersService', () => {
         { provide: OrdersRepository, useValue: repo },
         { provide: AuditLogsService, useValue: auditLogsService },
         { provide: ArticlesService, useValue: articlesService },
+        { provide: TransactionsService, useValue: transactionSerivice },
       ],
     }).compile();
     service = module.get(OrdersService);

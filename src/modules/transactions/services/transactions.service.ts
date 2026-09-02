@@ -5,7 +5,6 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { OrdersService } from 'src/modules/orders/services/orders.service';
 import { DbOrTx } from 'src/shared/database/base.repository';
 import { ITransaction } from '../interface';
 import { TransactionRepository } from '../repositories/transactions.repositories';
@@ -22,16 +21,12 @@ import {
 @Injectable()
 export class TransactionsService {
   private readonly logger = new Logger(TransactionsService.name);
-  constructor(
-    private readonly transactionsRepo: TransactionRepository,
-    private readonly ordersService: OrdersService,
-  ) {}
+  constructor(private readonly transactionsRepo: TransactionRepository) {}
   async create(dto: TCreateTransactionsDto, tx?: DbOrTx) {
     const parsed = createTransactionsSchema.safeParse(dto);
     if (!parsed.success) {
       throw new UnprocessableEntityException(parsed.error, 'Validation failed');
     }
-    await this.assertOrderExists(parsed.data.orderId);
 
     return this.transactionsRepo.create(parsed.data, tx);
   }
@@ -85,12 +80,5 @@ export class TransactionsService {
     }
 
     return this.transactionsRepo.update(id, updateData, tx);
-  }
-
-  private async assertOrderExists(orderId: string) {
-    const order = await this.ordersService.findById(orderId);
-    if (!order) {
-      throw new NotFoundException(`order ${orderId} not found`);
-    }
   }
 }
