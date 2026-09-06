@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, gte, lt, SQL, sql } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { BaseRepository, DbOrTx } from 'src/shared/database/base.repository';
-import { DRIZZLE_DB } from 'src/shared/database/database.module';
-import { orders } from 'src/shared/database/schema';
+import { BaseRepository, DbOrTx } from 'src/database/base.repository';
+import { DRIZZLE_DB } from 'src/database/database.module';
+import { orders } from 'src/database/schema';
 import { TListOrdersQuery } from '../validation/orders-validation.schema';
 import { uuidv7 } from 'uuidv7';
 
@@ -18,7 +18,7 @@ export class OrdersRepository extends BaseRepository<typeof orders> {
       .select()
       .from(orders)
       .where(eq(orders.id, id));
-    return order;
+    return order ?? null;
   }
 
   async findAll(opts?: TListOrdersQuery) {

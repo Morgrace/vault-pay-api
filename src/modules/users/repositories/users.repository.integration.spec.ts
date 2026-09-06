@@ -3,9 +3,9 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import { UsersRepository } from './users.repository';
-import { DRIZZLE_DB } from 'src/shared/database/database.module';
-import * as schema from 'src/shared/database/schema';
-import { users } from 'src/shared/database/schema';
+import { DRIZZLE_DB } from 'src/database/database.module';
+import * as schema from 'src/database/schema';
+import { users } from 'src/database/schema';
 
 // ─── Test DB Config ──────────────────────────────────────────────────────────
 // hardcoded — no ConfigService needed in tests, we own this connection

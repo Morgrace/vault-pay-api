@@ -1,3 +1,4 @@
+import { integer } from 'drizzle-orm/pg-core';
 import {
   boolean,
   index,
@@ -16,6 +17,8 @@ export const webhookEvents = pgTable(
     eventId: varchar('event_id', { length: 255 }).notNull().unique(),
     eventType: varchar('event_type', { length: 255 }).notNull(),
     payload: jsonb('payload').notNull(),
+    attempts: integer('attempts').notNull().default(0),
+    lastAttempt: timestamp('last_attempt', { withTimezone: true }),
     processed: boolean('processed').notNull().default(false),
     processedAt: timestamp('processed_at', { withTimezone: true }),
     error: text('error'),
@@ -23,5 +26,10 @@ export const webhookEvents = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [index('idx_webhook_events_processed').on(table.processed)],
+  (table) => [
+    index('idx_webhook_events_processed_created').on(
+      table.processed,
+      table.createdAt,
+    ),
+  ],
 );

@@ -1,7 +1,4 @@
-import {
-  ORDER_STATUS_VALUES,
-  PLAN_CURRENCY_VALUES,
-} from 'src/shared/database/schema';
+import { ORDER_STATUS_VALUES, PLAN_CURRENCY_VALUES } from 'src/database/schema';
 import z from 'zod';
 
 export const listOrdersQuerySchema = z.object({

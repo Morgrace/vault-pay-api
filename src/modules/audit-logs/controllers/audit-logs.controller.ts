@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import { auditLogs } from 'src/shared/database/schema';
+import { auditLogs } from 'src/database/schema';
 import {
   auditLogQuerySchema,
   auditLogRowSchema,

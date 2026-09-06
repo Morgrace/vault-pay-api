@@ -8,7 +8,7 @@ import {
 import { ArticlesService } from 'src/modules/articles/services/articles.service';
 import { AuditLogsService } from 'src/modules/audit-logs/services/audit-logs.service';
 import { ISessionData } from 'src/modules/auth/auth.interface';
-import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
+import { ORDER_STATUS_VALUES } from 'src/database/schema';
 import z from 'zod';
 import { OrdersRepository } from '../repositories/orders.repository';
 import {

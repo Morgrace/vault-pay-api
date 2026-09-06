@@ -22,7 +22,7 @@ import type { ISessionData } from 'src/modules/auth/auth.interface';
 import { Public } from 'src/common/decorators/public.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Role, Roles } from 'src/common/decorators/roles.decorator';
-import { ORDER_STATUS_VALUES } from 'src/shared/database/schema';
+import { ORDER_STATUS_VALUES } from 'src/database/schema';
 
 @Controller('orders')
 export class OrdersController {

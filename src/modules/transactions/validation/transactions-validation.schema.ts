@@ -1,7 +1,7 @@
 import {
   PLAN_CURRENCY_VALUES,
   TRANSACTION_STATUS_VALUES,
-} from 'src/shared/database/schema';
+} from 'src/database/schema';
 import z from 'zod';
 export const transactionsBaseSchema = z.object({
   currency: z.enum(PLAN_CURRENCY_VALUES),

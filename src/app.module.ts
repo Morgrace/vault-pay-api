@@ -11,12 +11,13 @@ import { ResponseTransformInterceptor } from './common/interceptors/response-tra
 import { appConfig } from './config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
-import { DatabaseModule, DRIZZLE_DB } from './shared/database/database.module';
+import { DatabaseModule, DRIZZLE_DB } from './database/database.module';
 import { RedisModule } from './shared/redis/redis.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { Public } from './common/decorators/public.decorator';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { WebhookEventsModule } from './modules/webhook-events/webhook-events.module';
 
 @Public()
 @Controller()
@@ -95,6 +96,7 @@ export class AppController {
     ArticlesModule,
     AuditLogsModule,
     OrdersModule,
+    WebhookEventsModule,
   ],
   controllers: [AppController],
   providers: [

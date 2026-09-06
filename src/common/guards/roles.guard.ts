@@ -1,4 +1,5 @@
 import {
+  CanActivate,
   ExecutionContext,
   ForbiddenException,
   Injectable,
@@ -9,7 +10,7 @@ import { ROLES_KEY, RoleType } from '../decorators/roles.decorator';
 import { Request } from 'express';
 
 @Injectable()
-export class RolesGuard {
+export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {

@@ -13,9 +13,9 @@ import {
   sql,
 } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { BaseRepository } from 'src/shared/database/base.repository';
-import { DRIZZLE_DB } from 'src/shared/database/database.module';
-import { articles } from 'src/shared/database/schema';
+import { BaseRepository } from 'src/database/base.repository';
+import { DRIZZLE_DB } from 'src/database/database.module';
+import { articles } from 'src/database/schema';
 import { uuidv7 } from 'uuidv7';
 import { TListArticleQuery } from '../validation/article-validation.schema';
 

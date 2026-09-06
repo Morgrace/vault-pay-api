@@ -14,6 +14,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { type ISessionData } from '../auth.interface';
 import { AuthService } from '../services/auth.service';
+import { appConfig } from 'src/config';
 
 @Controller('auth')
 export class AuthController {
@@ -88,7 +89,7 @@ export class AuthController {
   private setCookie(res: Response, token: string): void {
     res.cookie('vaultpay_session', token, {
       httpOnly: true,
-      secure: this.configService.get<string>('app.nodeEnv') === 'production',
+      secure: appConfig().app.env === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,

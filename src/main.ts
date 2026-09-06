@@ -15,7 +15,7 @@ process.on('unhandledRejection', (reason) => {
 
 async function bootstrap() {
   try {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, { rawBody: true });
 
     const { port, apiPrefix } = appConfig().app;
 

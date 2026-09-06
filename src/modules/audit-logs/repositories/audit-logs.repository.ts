@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { BaseRepository, DbOrTx } from 'src/shared/database/base.repository';
-import { DRIZZLE_DB } from 'src/shared/database/database.module';
-import { auditLogs } from 'src/shared/database/schema';
+import { BaseRepository, DbOrTx } from 'src/database/base.repository';
+import { DRIZZLE_DB } from 'src/database/database.module';
+import { auditLogs } from 'src/database/schema';
 import { IPaginatedResult, IPaginationOptions } from 'src/shared/types';
 
 @Injectable()

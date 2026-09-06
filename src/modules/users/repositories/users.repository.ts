@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { BaseRepository } from 'src/shared/database/base.repository';
-import { DRIZZLE_DB } from 'src/shared/database/database.module';
-import { users } from 'src/shared/database/schema';
+import { BaseRepository } from 'src/database/base.repository';
+import { DRIZZLE_DB } from 'src/database/database.module';
+import { users } from 'src/database/schema';
 import { uuidv7 } from 'uuidv7';
 
 @Injectable()

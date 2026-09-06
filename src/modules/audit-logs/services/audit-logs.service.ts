@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { auditLogs } from 'src/shared/database/schema';
+import { auditLogs } from 'src/database/schema';
 import { AuditLogsRepository } from '../repositories/audit-logs.repository';
 import { IPaginatedResult, IPaginationOptions } from 'src/shared/types';
-import { DbOrTx } from 'src/shared/database/base.repository';
+import { DbOrTx } from 'src/database/base.repository';
 
 @Injectable()
 export class AuditLogsService {

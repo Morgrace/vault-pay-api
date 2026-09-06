@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { BaseRepository, DbOrTx } from 'src/shared/database/base.repository';
-import { DRIZZLE_DB } from 'src/shared/database/database.module';
-import { transactions } from 'src/shared/database/schema';
+import { BaseRepository, DbOrTx } from 'src/database/base.repository';
+import { DRIZZLE_DB } from 'src/database/database.module';
+import { transactions } from 'src/database/schema';
 import {
   TCreateTransactionsDto,
   TListTransactionQuery,

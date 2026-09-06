@@ -1,7 +1,7 @@
 import {
   PLAN_CURRENCY_VALUES,
   TRANSACTION_STATUS_VALUES,
-} from 'src/shared/database/schema';
+} from 'src/database/schema';
 
 export interface ITransaction {
   id: string;

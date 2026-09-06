@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { DbOrTx } from 'src/shared/database/base.repository';
+import { DbOrTx } from 'src/database/base.repository';
 import { ITransaction } from '../interface';
 import { TransactionRepository } from '../repositories/transactions.repositories';
 import {
