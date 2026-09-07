@@ -4,7 +4,6 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
 import axios from 'axios';
 import { RedisService } from 'src/shared/redis/redis.service';
@@ -14,13 +13,13 @@ import {
   ISessionData,
   TOAuthProviders,
 } from '../auth.interface';
+import { appConfig } from 'src/config';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private readonly configService: ConfigService,
     private readonly redisService: RedisService,
     private readonly usersService: UsersService,
   ) {}
@@ -117,14 +116,11 @@ export class AuthService {
   }
 
   private getProviderConfig(provider: TOAuthProviders) {
+    const providerConfig = appConfig.oauth[provider];
     return {
-      clientId: this.configService.get<string>(`oauth.${provider}.clientID`)!,
-      clientSecret: this.configService.get<string>(
-        `oauth.${provider}.clientSecret`,
-      )!,
-      redirectUri: this.configService.get<string>(
-        `oauth.${provider}.callbackURL`,
-      )!,
+      clientId: providerConfig.clientID!,
+      clientSecret: providerConfig.clientSecret!,
+      redirectUri: providerConfig.callbackURL!,
     };
   }
 

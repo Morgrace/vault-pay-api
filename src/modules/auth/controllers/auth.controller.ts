@@ -8,7 +8,6 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
@@ -18,10 +17,7 @@ import { appConfig } from 'src/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Get('google')
@@ -89,7 +85,7 @@ export class AuthController {
   private setCookie(res: Response, token: string): void {
     res.cookie('vaultpay_session', token, {
       httpOnly: true,
-      secure: appConfig().app.env === 'production',
+      secure: appConfig.app.env === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -97,9 +93,6 @@ export class AuthController {
   }
 
   private getRedirectUrl(): string {
-    return (
-      this.configService.get<string>('app.authRedirectUrl') ??
-      'http://localhost:5173'
-    );
+    return appConfig.app.authRedirectUrl ?? 'http://localhost:5173';
   }
 }

@@ -17,7 +17,7 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule, { rawBody: true });
 
-    const { port, apiPrefix } = appConfig().app;
+    const { port, apiPrefix } = appConfig.app;
 
     app.setGlobalPrefix(apiPrefix, {
       exclude: ['health', 'metrics'],

@@ -1,8 +1,8 @@
 import { Global, Inject, Module, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import * as schema from './schema';
+import { appConfig } from '../config';
 
 export const DRIZZLE_DB = 'DRIZZLE_DB';
 const POSTGRES_CLIENT = 'POSTGRES_CLIENT';
@@ -12,14 +12,13 @@ const POSTGRES_CLIENT = 'POSTGRES_CLIENT';
   providers: [
     {
       provide: POSTGRES_CLIENT,
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
+      useFactory: () => {
         return postgres({
-          host: configService.get<string>('database.host'),
-          port: configService.get<number>('database.port'),
-          user: configService.get<string>('database.username'),
-          password: configService.get<string>('database.password'),
-          database: configService.get<string>('database.database'),
+          host: appConfig.database.host,
+          port: appConfig.database.port,
+          user: appConfig.database.username,
+          password: appConfig.database.password,
+          database: appConfig.database.database,
           max: 10,
           idle_timeout: 20,
           max_lifetime: 900,

@@ -66,7 +66,7 @@ interface NodeSystemError {
 @Catch()
 export class CustomExceptionFilters implements ExceptionFilter {
   private readonly logger = new Logger(CustomExceptionFilters.name);
-  private readonly isProduction = appConfig().app.env === 'production';
+  private readonly isProduction = appConfig.app.env === 'production';
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();

@@ -8,7 +8,6 @@ import axios from 'axios';
 import { AuthService } from './auth.service';
 import { RedisService } from 'src/shared/redis/redis.service';
 import { UsersService } from '../../users/services/users.service';
-import { ConfigService } from '@nestjs/config';
 
 // still mocking axios — no real Google/GitHub in tests
 jest.mock('axios');
@@ -16,20 +15,6 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 // still mocking UsersService — that layer has its own integration tests
 const mockUsersService = { findOrCreate: jest.fn() };
-
-const mockConfigService = {
-  get: jest.fn((key: string) => {
-    const config: Record<string, string> = {
-      'oauth.google.clientID': 'google-client-id',
-      'oauth.google.clientSecret': 'google-client-secret',
-      'oauth.google.callbackURL': 'http://localhost:3000/auth/google/callback',
-      'oauth.github.clientID': 'github-client-id',
-      'oauth.github.clientSecret': 'github-client-secret',
-      'oauth.github.callbackURL': 'http://localhost:3000/auth/github/callback',
-    };
-    return config[key];
-  }),
-};
 
 // ─── Suite ───────────────────────────────────────────────────────────────────
 
@@ -55,7 +40,6 @@ describe('AuthService (integration - real Redis)', () => {
     module = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: ConfigService, useValue: mockConfigService },
         { provide: RedisService, useValue: mockRedisService },
         { provide: UsersService, useValue: mockUsersService },
       ],

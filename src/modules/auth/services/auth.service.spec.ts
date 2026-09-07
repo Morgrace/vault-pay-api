@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { ConfigService } from '@nestjs/config';
 import {
   BadRequestException,
   InternalServerErrorException,
@@ -29,20 +28,6 @@ const mockUsersService = {
   findOrCreate: jest.fn(),
 };
 
-const mockConfigService = {
-  get: jest.fn((key: string) => {
-    const config: Record<string, string> = {
-      'oauth.google.clientID': 'google-client-id',
-      'oauth.google.clientSecret': 'google-client-secret',
-      'oauth.google.callbackURL': 'http://localhost:3000/auth/google/callback',
-      'oauth.github.clientID': 'github-client-id',
-      'oauth.github.clientSecret': 'github-client-secret',
-      'oauth.github.callbackURL': 'http://localhost:3000/auth/github/callback',
-    };
-    return config[key];
-  }),
-};
-
 // ─── Test Suite ─────────────────────────────────────────────────────────────
 
 describe('AuthService', () => {
@@ -52,7 +37,6 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: ConfigService, useValue: mockConfigService },
         { provide: RedisService, useValue: mockRedisService },
         { provide: UsersService, useValue: mockUsersService },
       ],

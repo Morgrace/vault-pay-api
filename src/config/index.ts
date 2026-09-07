@@ -1,4 +1,65 @@
-export const appConfig = () => ({
+import { MailerOptions } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
+
+type AppServiceConfig = {
+  port: number;
+  authRedirectUrl: string | undefined;
+  env: string;
+  apiPrefix: string;
+  clientUrl: string | undefined;
+};
+
+type DatabaseServiceConfig = {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+};
+
+type RedisServiceConfig = {
+  host: string;
+  port: number;
+};
+
+type RabbitMQServiceConfig = {
+  urls: string[];
+};
+
+type PaystackServiceConfig = {
+  secretKey: string | undefined;
+};
+
+type GoogleOAuthConfig = {
+  clientID: string | undefined;
+  clientSecret: string | undefined;
+  callbackURL: string | undefined;
+};
+
+type GithubOAuthConfig = {
+  clientID: string | undefined;
+  clientSecret: string | undefined;
+  callbackURL: string | undefined;
+};
+
+type OAuthServiceConfig = {
+  google: GoogleOAuthConfig;
+  github: GithubOAuthConfig;
+};
+
+type AppConfig = {
+  app: AppServiceConfig;
+  database: DatabaseServiceConfig;
+  redis: RedisServiceConfig;
+  rabbitmq: RabbitMQServiceConfig;
+  paystack: PaystackServiceConfig;
+  mailer: MailerOptions;
+  oauth: OAuthServiceConfig;
+};
+
+const mailPort = Number.parseInt(process.env.MAIL_PORT || '587', 10);
+
+export const appConfig: AppConfig = {
   app: {
     port: parseInt(process.env.PORT ?? '3000', 10),
     authRedirectUrl: process.env.AUTH_REDIRECT_URL,
@@ -23,15 +84,29 @@ export const appConfig = () => ({
   paystack: {
     secretKey: process.env.PAYSTACK_SECRET_KEY,
   },
-  mail: {
-    host: process.env.MAIL_HOST,
-    port: parseInt(process.env.MAIL_PORT ?? '465', 10),
-    secure: process.env.NODE_ENV === 'production',
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
+  mailer: {
+    transport: {
+      host: process.env.MAIL_HOST,
+      port: mailPort,
+      service: process.env.MAIL_SERVICE,
+      secure: mailPort === 465,
+      requireTLS: mailPort !== 465,
+      pool: true,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASSWORD,
+      },
     },
-    from: process.env.MAIL_FROM ?? 'noreply@vaultpay.com',
+    defaults: {
+      from: process.env.MAIL_FROM,
+    },
+    template: {
+      dir: `${process.cwd()}/dist/email-templates/`,
+      adapter: new HandlebarsAdapter(),
+      options: {
+        strict: true,
+      },
+    },
   },
   oauth: {
     google: {
@@ -45,4 +120,4 @@ export const appConfig = () => ({
       callbackURL: process.env.GITHUB_CALLBACK_URL,
     },
   },
-});
+};
