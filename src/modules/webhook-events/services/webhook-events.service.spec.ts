@@ -30,7 +30,7 @@ describe('WebhookEventsService', () => {
   describe('findAll', () => {
     it('throws UnprocessableEntityException when an invalid dto is passed', async () => {
       const dto: TListWebhookEvents = {
-        processed: 'true' as unknown as boolean,
+        status: 'invalid_status' as unknown as 'pending',
         limit: 1000,
         page: 1,
       };

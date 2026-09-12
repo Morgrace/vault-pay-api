@@ -36,6 +36,12 @@ export class OrdersController {
   }
 
   @Public()
+  @Get('verify/:reference')
+  verifyByReference(@Param('reference') reference: string) {
+    return this.ordersService.verifyByReference(reference);
+  }
+
+  @Public()
   @Get(':id')
   findById(@Param('id', ParseUUIDPipe) id: string) {
     return this.ordersService.findById(id);
@@ -52,6 +58,13 @@ export class OrdersController {
     return this.ordersService.create(body, currentUser, ip);
   }
 
+  @Public()
+  @Post('confirm')
+  @HttpCode(HttpStatus.OK)
+  confirmPayment(@Body() body: { reference: string; paymentData?: unknown }) {
+    return this.ordersService.confirmPayment(body.reference, body.paymentData);
+  }
+
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
@@ -62,5 +75,24 @@ export class OrdersController {
     @CurrentUser() currentUser: ISessionData,
   ) {
     return this.ordersService.updateStatus(id, status, currentUser, ip);
+  }
+
+  @Post(':id/verify')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  adminVerify(@Param('id', ParseUUIDPipe) id: string) {
+    return this.ordersService.adminVerify(id);
+  }
+
+  @Post(':id/refund')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  adminRefund(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('reason') reason?: string,
+  ) {
+    return this.ordersService.adminRefund(id, reason);
   }
 }

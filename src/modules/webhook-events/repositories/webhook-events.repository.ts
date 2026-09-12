@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, sql, SQL } from 'drizzle-orm';
+import { and, desc, eq, inArray, lt, sql, SQL } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { BaseRepository, DbOrTx } from 'src/database/base.repository';
 import { DRIZZLE_DB } from 'src/database/database.module';
@@ -35,14 +35,14 @@ export class WebhookEventsRepository extends BaseRepository<
 
     const conditions: SQL[] = [];
 
-    if (opts?.eventId) {
-      conditions.push(eq(webhookEvents.eventId, opts.eventId));
+    if (opts?.reference) {
+      conditions.push(eq(webhookEvents.reference, opts.reference));
     }
     if (opts?.eventType) {
       conditions.push(eq(webhookEvents.eventType, opts.eventType));
     }
-    if (opts?.processed !== undefined) {
-      conditions.push(eq(webhookEvents.processed, opts?.processed));
+    if (opts?.status) {
+      conditions.push(eq(webhookEvents.status, opts.status));
     }
 
     const [items, countResult] = await Promise.all([
@@ -81,5 +81,115 @@ export class WebhookEventsRepository extends BaseRepository<
       .returning();
 
     return webhookEvent ?? null;
+  }
+
+  // ─── Inbox Pattern Methods ─────────────────────────────────────────────
+
+  async ingest(
+    eventType: string,
+    reference: string,
+    payload: unknown,
+    tx?: DbOrTx,
+  ): Promise<boolean> {
+    const result = await this.executor(tx)
+      .insert(webhookEvents)
+      .values({
+        id: uuidv7(),
+        eventType,
+        reference,
+        payload,
+      })
+      .onConflictDoNothing({
+        target: [webhookEvents.eventType, webhookEvents.reference],
+      })
+      .returning();
+
+    // result length === 1 means inserted, 0 means duplicate (conflict)
+    return result.length === 1;
+  }
+
+  async claimBatch(
+    limit: number,
+    workerId: string,
+  ): Promise<(typeof webhookEvents.$inferSelect)[]> {
+    return this.db.transaction(async (tx) => {
+      // Lock pending rows, skip any already locked by another worker
+      const rows = await tx.execute(sql`
+        SELECT * FROM webhook_events
+        WHERE status = 'pending'
+          AND next_attempt_at <= now()
+        ORDER BY created_at ASC
+        LIMIT ${limit}
+        FOR UPDATE SKIP LOCKED
+      `);
+
+      const typedRows =
+        rows as unknown as (typeof webhookEvents.$inferSelect)[];
+      if (typedRows.length === 0) return [];
+
+      // Mark them as processing
+      const ids = typedRows.map((r) => r.id);
+      await tx
+        .update(webhookEvents)
+        .set({
+          status: 'processing',
+          lockedAt: new Date(),
+          lockedBy: workerId,
+        })
+        .where(inArray(webhookEvents.id, ids));
+
+      return typedRows;
+    });
+  }
+
+  async markDone(id: string): Promise<void> {
+    await this.db
+      .update(webhookEvents)
+      .set({
+        status: 'done',
+        processedAt: new Date(),
+        lockedAt: null,
+        lockedBy: null,
+      })
+      .where(eq(webhookEvents.id, id));
+  }
+
+  async markFailed(
+    id: string,
+    error: string,
+    attempts: number,
+    nextAttemptAt: Date,
+    finalFailure: boolean,
+  ): Promise<void> {
+    await this.db
+      .update(webhookEvents)
+      .set({
+        status: finalFailure ? 'failed' : 'pending',
+        attempts,
+        lastError: error,
+        nextAttemptAt,
+        lockedAt: null,
+        lockedBy: null,
+      })
+      .where(eq(webhookEvents.id, id));
+  }
+
+  async reclaimStuck(staleThreshold: Date): Promise<number> {
+    const result = await this.db
+      .update(webhookEvents)
+      .set({
+        status: 'pending',
+        lockedAt: null,
+        lockedBy: null,
+      })
+      .where(
+        and(
+          eq(webhookEvents.status, 'processing'),
+          lt(webhookEvents.lockedAt, staleThreshold),
+        ),
+      )
+      .returning();
+
+    return result.length;
   }
 }

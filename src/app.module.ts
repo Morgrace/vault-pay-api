@@ -16,6 +16,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { UsersModule } from './modules/users/users.module';
 import { WebhookEventsModule } from './modules/webhook-events/webhook-events.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { RedisModule } from './shared/redis/redis.module';
 
 @Public()
@@ -51,6 +53,8 @@ export class AppController {
     AuditLogsModule,
     OrdersModule,
     WebhookEventsModule,
+    WebhooksModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [

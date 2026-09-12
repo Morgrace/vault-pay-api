@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="color-scheme" content="light" />
+    <title>Article Purchased</title>
+    <style>
+      body { margin: 0; padding: 0; width: 100% !important; background: #eef2f6; }
+      img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+      table { border-collapse: collapse; }
+      a { color: #4f46e5; }
+      @media only screen and (max-width: 620px) {
+        .container { width: 100% !important; }
+        .pad { padding-left: 24px !important; padding-right: 24px !important; }
+      }
+    </style>
+  </head>
+  <body style="margin:0; padding:0; background:#eef2f6;">
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent; height:0; width:0;">
+      Your purchase of {{articleTitle}} is confirmed. Amount: {{amount}} {{currency}}.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6;">
+      <tr>
+        <td align="center" style="padding:32px 12px;">
+          <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0"
+                 style="width:600px; max-width:600px; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(4,34,59,0.08);">
+
+            <!-- Brand header -->
+            <tr>
+              <td class="pad" style="padding:32px 40px 24px;">
+                <span style="font-family:Arial,Helvetica,sans-serif; font-size:26px; font-weight:bold; color:#1a1a2e; letter-spacing:-0.5px;">VaultPay</span>
+              </td>
+            </tr>
+
+            <!-- Accent rule -->
+            <tr>
+              <td style="font-size:0; line-height:0;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="25%" height="4" style="background:#4f46e5; font-size:0; line-height:0; height:4px;">&nbsp;</td>
+                    <td width="25%" height="4" style="background:#7c3aed; font-size:0; line-height:0; height:4px;">&nbsp;</td>
+                    <td width="25%" height="4" style="background:#a855f7; font-size:0; line-height:0; height:4px;">&nbsp;</td>
+                    <td width="25%" height="4" style="background:#c084fc; font-size:0; line-height:0; height:4px;">&nbsp;</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Greeting -->
+            <tr>
+              <td class="pad" style="padding:32px 40px 0; font-family:Arial,Helvetica,sans-serif; color:#1a1a2e;">
+                <p style="margin:0 0 16px; font-size:16px; line-height:1.6;">Hi {{userName}},</p>
+                <p style="margin:0 0 24px; font-size:15px; line-height:1.7; color:#444444;">
+                  Thank you for your purchase! Here's a preview of your article.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Article preview -->
+            <tr>
+              <td class="pad" style="padding:0 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                       style="background:#f8fafc; border-radius:10px; border-left:4px solid #4f46e5;">
+                  <tr>
+                    <td style="padding:24px 28px; font-family:Arial,Helvetica,sans-serif;">
+                      <div style="font-size:18px; font-weight:bold; color:#1a1a2e; padding:0 0 12px; line-height:1.3;">{{articleTitle}}</div>
+                      <p style="margin:0 0 16px; font-size:14px; line-height:1.7; color:#444444;">{{articlePreview}}...</p>
+                      <a href="{{articleUrl}}" style="display:inline-block; padding:12px 24px; background:#4f46e5; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:bold; text-decoration:none; border-radius:6px;">Read Full Article</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Purchase details -->
+            <tr>
+              <td class="pad" style="padding:0 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                       style="background:#f8fafc; border-radius:10px;">
+                  <tr>
+                    <td style="padding:24px 28px; font-family:Arial,Helvetica,sans-serif;">
+                      <div style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#4f46e5;">Article purchased</div>
+                      <div style="font-size:20px; font-weight:bold; color:#1a1a2e; padding:8px 0 4px; line-height:1.3;">{{articleTitle}}</div>
+                      <div style="font-size:28px; font-weight:bold; color:#1a1a2e; padding:6px 0;">{{amount}} <span style="font-size:16px; font-weight:normal; color:#64748b;">{{currency}}</span></div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Detail table -->
+            <tr>
+              <td class="pad" style="padding:28px 40px 0; font-family:Arial,Helvetica,sans-serif;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+                  <tr>
+                    <td style="padding:12px 0; border-bottom:1px solid #f1f5f9; color:#64748b;">Order ID</td>
+                    <td align="right" style="padding:12px 0; border-bottom:1px solid #f1f5f9; color:#1a1a2e; font-weight:bold;">{{orderId}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px 0; border-bottom:1px solid #f1f5f9; color:#64748b;">Date</td>
+                    <td align="right" style="padding:12px 0; border-bottom:1px solid #f1f5f9; color:#1a1a2e;">{{purchasedAt}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px 0; color:#64748b;">Status</td>
+                    <td align="right" style="padding:12px 0;">
+                      <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:#10b981; color:#ffffff; font-size:11px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">Paid</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Message -->
+            <tr>
+              <td class="pad" style="padding:28px 40px 36px; font-family:Arial,Helvetica,sans-serif;">
+                <p style="margin:0; font-size:14px; line-height:1.7; color:#555555;">
+                  Questions about your purchase? Just reply to this email — we're happy to help.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="pad" style="padding:24px 40px 28px; background:#1a1a2e; font-family:Arial,Helvetica,sans-serif;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="font-size:13px; line-height:1.7; color:#a9bed2;">
+                      <div style="color:#ffffff; font-weight:bold; font-size:14px; padding-bottom:4px;">VaultPay</div>
+                      <div><a href="https://vaultpay.com" style="color:#a9bed2; text-decoration:underline;">https://vaultpay.com</a></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-top:16px; border-top:1px solid rgba(255,255,255,0.12); font-size:11px; color:#7f97ac;">
+                      &copy; {{year}} VaultPay. All rights reserved.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

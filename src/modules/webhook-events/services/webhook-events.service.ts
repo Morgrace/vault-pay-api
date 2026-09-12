@@ -10,6 +10,7 @@ import {
 @Injectable()
 export class WebhookEventsService {
   constructor(private readonly webhookEventsRepo: WebhookEventsRepository) {}
+
   async create(dto: unknown, tx?: DbOrTx) {
     const parsed = createWebhookEventsSchema.safeParse(dto);
 
@@ -38,5 +39,45 @@ export class WebhookEventsService {
       throw new UnprocessableEntityException(parsed.error, 'Validation failed');
     }
     return this.webhookEventsRepo.update(id, parsed.data, tx);
+  }
+
+  // ─── Inbox Pattern Methods ─────────────────────────────────────────────
+
+  async ingest(eventType: string, reference: string, payload: unknown) {
+    return this.webhookEventsRepo.ingest(eventType, reference, payload);
+  }
+
+  async claimBatch(limit: number, workerId: string) {
+    return this.webhookEventsRepo.claimBatch(limit, workerId);
+  }
+
+  async markDone(id: string) {
+    return this.webhookEventsRepo.markDone(id);
+  }
+
+  async markFailed(
+    id: string,
+    error: string,
+    attempts: number,
+    maxAttempts: number,
+  ) {
+    const finalFailure = attempts >= maxAttempts;
+
+    // Exponential backoff: 30s, 60s, 120s, 240s...
+    const delayMs = finalFailure ? 0 : 30_000 * Math.pow(2, attempts);
+    const nextAttemptAt = new Date(Date.now() + delayMs);
+
+    return this.webhookEventsRepo.markFailed(
+      id,
+      error,
+      attempts,
+      nextAttemptAt,
+      finalFailure,
+    );
+  }
+
+  async reclaimStuck(staleMinutes: number) {
+    const threshold = new Date(Date.now() - staleMinutes * 60_000);
+    return this.webhookEventsRepo.reclaimStuck(threshold);
   }
 }

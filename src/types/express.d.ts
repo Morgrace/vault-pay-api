@@ -5,6 +5,7 @@ declare global {
     interface Request {
       correlationId?: string;
       user?: ISessionData;
+      rawBody?: Buffer;
     }
   }
 }

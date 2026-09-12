@@ -1,7 +1,6 @@
-import { integer } from 'drizzle-orm/pg-core';
+import { unique } from 'drizzle-orm/pg-core';
 import {
-  boolean,
-  index,
+  integer,
   jsonb,
   pgTable,
   text,
@@ -10,26 +9,36 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+export const WEBHOOK_EVENT_STATUS_VALUES = [
+  'pending',
+  'processing',
+  'done',
+  'failed',
+] as const;
+
 export const webhookEvents = pgTable(
   'webhook_events',
   {
     id: uuid('id').primaryKey(),
-    eventId: varchar('event_id', { length: 255 }).notNull().unique(),
-    eventType: varchar('event_type', { length: 255 }).notNull(),
+    eventType: varchar('event_type', { length: 100 }).notNull(),
+    reference: varchar('reference', { length: 255 }).notNull(),
     payload: jsonb('payload').notNull(),
+    status: varchar('status', { length: 20 }).notNull().default('pending'),
     attempts: integer('attempts').notNull().default(0),
-    lastAttempt: timestamp('last_attempt', { withTimezone: true }),
-    processed: boolean('processed').notNull().default(false),
+    maxAttempts: integer('max_attempts').notNull().default(5),
+    nextAttemptAt: timestamp('next_attempt_at').notNull().defaultNow(),
+    lockedAt: timestamp('locked_at', { withTimezone: true }),
+    lockedBy: varchar('locked_by', { length: 100 }),
+    lastError: text('last_error'),
     processedAt: timestamp('processed_at', { withTimezone: true }),
-    error: text('error'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
   (table) => [
-    index('idx_webhook_events_processed_created').on(
-      table.processed,
-      table.createdAt,
+    unique('webhook_events_event_type_reference_unique').on(
+      table.eventType,
+      table.reference,
     ),
   ],
 );

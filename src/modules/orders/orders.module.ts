@@ -5,11 +5,12 @@ import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 import { OrdersRepository } from './repositories/orders.repository';
 import { ArticlesModule } from '../articles/articles.module';
 import { TransactionsModule } from '../transactions/transactions.module';
+import { PaymentsModule } from '../payments/payments.module';
 
 @Module({
   controllers: [OrdersController],
   exports: [OrdersService],
-  imports: [AuditLogsModule, ArticlesModule, TransactionsModule],
+  imports: [AuditLogsModule, ArticlesModule, TransactionsModule, PaymentsModule],
   providers: [OrdersRepository, OrdersService],
 })
 export class OrdersModule {}
